@@ -9,13 +9,13 @@ export const RateContentOK = new Rate('content_OK');
 
 export const options = {
   thresholds: {
-    http_req_failed: ['rate<0.30'],
-    get_contacts: ['p(99)<500'],
-    content_OK: ['rate>0.95']
+    http_req_duration: ['p(95)<5700'], // 95% das respostas abaixo de 5700ms
+    http_req_failed: ['rate<0.12'] // Menos de 12% de erro
   },
   stages: [
-    { duration: '10s', target: 5 },
-    { duration: '20s', target: 15 }
+    { duration: '1m', target: 10 }, // Sobe para 10 VUs em 1 minuto
+    { duration: '3m', target: 300 }, // Sobe gradualmente para 300 VUs em 3 minutos
+    { duration: '1m', target: 0 } // Faz o ramp-down (descida) em 1 minuto
   ]
 };
 
@@ -27,7 +27,7 @@ export function handleSummary(data) {
 }
 
 export default function () {
-  const baseUrl = 'https://test.k6.io/';
+  const baseUrl = 'https://fakestoreapi.com/users';
 
   const params = {
     headers: {
